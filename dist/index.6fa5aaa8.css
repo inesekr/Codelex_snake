@@ -1,0 +1,30 @@
+@import "https://fonts.googleapis.com/css2?family=Montserrat:wght@700";
+* {
+  user-select: none;
+}
+
+body {
+  margin: 0;
+}
+
+body:before {
+  content: "";
+  z-index: -1;
+  width: 241%;
+  height: 241%;
+  opacity: .2;
+  background: #1a5324 url("logo.0ad9a92c.svg") 0 0 / 400px 200px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%)rotate(45deg);
+}
+
+.container {
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+}
+
+/*# sourceMappingURL=index.6fa5aaa8.css.map */
