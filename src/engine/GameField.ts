@@ -1,5 +1,6 @@
 import { Cell } from "./Cell";
 import { Game } from "../Game";
+import { Snake } from "./Snake";
 import configuration from "../configuration";
 
 export class GameField {
@@ -18,41 +19,50 @@ export class GameField {
   private readonly width: number;
   private readonly height: number;
 
-  private game: Game | undefined;
-  // private width:
+  private game?: Game;
+  snake = new Snake();
+  // private snake: Snake;
 
   constructor(game?: Game) {
-    // this.width = configuration.width;
     this.width = configuration.nbCellsX;
     this.height = configuration.nbCellsY;
     this.game = game;
+    this.snake = new Snake();
+    // this.snake = this.snake;
     this.seed();
   }
 
+  // const width = 45;
+  // const height = 25;
+
+  // Code if you want to increase number of apples for each level:
+  // let level = 0;
+  // if (this.game) {
+  //   level = this.game.runtimeConfiguration.level;
+  // }
+  // const numOfApples = level + 5;
   seed(): void {
-    // const width = 45;
-    // const height = 25;
-
-    // Code if you want to increase number of apples for each level:
-    // let level = 0;
-    // if (this.game) {
-    //   level = this.game.runtimeConfiguration.level;
-    // }
-    // const numOfApples = level + 5;
-
     const numOfApples = 5;
     this.apples = [];
-    for (let i = 0; i < numOfApples; i++) {
-      let x = Math.floor(Math.random() * this.width);
-      let y = Math.floor(Math.random() * this.height);
-      this.apples.push(new Cell(x, y));
+    for (let i = 1; i <= numOfApples; i++) {
+      // let x = Math.floor(Math.random() * this.width);
+      // let y = Math.floor(Math.random() * this.height);
+
+      while (true) {
+        const x = Math.floor(Math.random() * this.width);
+        const y = Math.floor(Math.random() * this.height);
+        const cell = new Cell(x, y);
+        if (!this.snake.isTakenBySnake(cell)) {
+          if (this.snake.head.x !== cell.x && this.snake.head.y !== cell.y) {
+            if (!this.apples.some((apple) => apple.equals(cell))) {
+              this.apples.push(cell);
+              break;
+            }
+          }
+        }
+      }
     }
   }
-
-  // while (this.isSnakeInside(new Cell(x, y))) {
-  //   x = Math.floor(Math.random() * width);
-  //   y = Math.floor(Math.random() * height);
-  // }
 
   getApples(): Cell[] {
     return this.apples;

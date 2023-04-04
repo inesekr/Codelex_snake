@@ -1,4 +1,4 @@
-import { GameField } from "./engine/GameField";
+import { GameField } from "./engine/Gamefield";
 import { Snake } from "./engine/Snake";
 import { Cell } from "./engine/Cell";
 import configuration from "./configuration";
@@ -9,14 +9,13 @@ export interface RuntimeConfiguration {
 }
 
 export class Game {
-  // private runtimeConfiguration:
   public runtimeConfiguration: RuntimeConfiguration = {
     level: 0,
     speed: configuration.defaultSpeed,
   };
   private score: number = 0;
   private running = true;
-  public field = new GameField(this);
+  public field = new GameField();
   private snake = new Snake();
   private nextTick = 0;
 
@@ -82,6 +81,7 @@ export class Game {
 
   die() {
     this.stop();
+    alert("you died...");
   }
 
   isOutside(cell: Cell) {

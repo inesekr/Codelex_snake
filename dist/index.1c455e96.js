@@ -711,7 +711,7 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 const configuration = {
     maxLevel: 10,
-    defaultSpeed: 500,
+    defaultSpeed: 200,
     nbCellsX: 45,
     nbCellsY: 25
 };
@@ -751,19 +751,18 @@ exports.export = function(dest, destName, get) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Game", ()=>Game);
-var _gameField = require("./engine/GameField");
+var _gamefield = require("./engine/Gamefield");
 var _snake = require("./engine/Snake");
 var _configuration = require("./configuration");
 var _configurationDefault = parcelHelpers.interopDefault(_configuration);
 class Game {
-    // private runtimeConfiguration:
     runtimeConfiguration = {
         level: 0,
         speed: (0, _configurationDefault.default).defaultSpeed
     };
     score = 0;
     running = true;
-    field = new (0, _gameField.GameField)(this);
+    field = new (0, _gamefield.GameField)();
     snake = new (0, _snake.Snake)();
     nextTick = 0;
     getSnake() {
@@ -809,6 +808,7 @@ class Game {
     }
     die() {
         this.stop();
+        alert("you died...");
     }
     isOutside(cell) {
         const { nbCellsX , nbCellsY  } = (0, _configurationDefault.default);
@@ -825,76 +825,7 @@ class Game {
     }
 }
 
-},{"./engine/GameField":"8jgQn","./engine/Snake":"guWf8","./configuration":"kyQGN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"8jgQn":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "GameField", ()=>GameField);
-var _cell = require("./Cell");
-var _configuration = require("../configuration");
-var _configurationDefault = parcelHelpers.interopDefault(_configuration);
-class GameField {
-    /**
-   * Called when level completed
-   */ apples = [];
-    // private width:
-    constructor(game){
-        // this.width = configuration.width;
-        this.width = (0, _configurationDefault.default).nbCellsX;
-        this.height = (0, _configurationDefault.default).nbCellsY;
-        this.game = game;
-        this.seed();
-    }
-    seed() {
-        // const width = 45;
-        // const height = 25;
-        // Code if you want to increase number of apples for each level:
-        // let level = 0;
-        // if (this.game) {
-        //   level = this.game.runtimeConfiguration.level;
-        // }
-        // const numOfApples = level + 5;
-        const numOfApples = 5;
-        this.apples = [];
-        for(let i = 0; i < numOfApples; i++){
-            let x = Math.floor(Math.random() * this.width);
-            let y = Math.floor(Math.random() * this.height);
-            this.apples.push(new (0, _cell.Cell)(x, y));
-        }
-    }
-    // while (this.isSnakeInside(new Cell(x, y))) {
-    //   x = Math.floor(Math.random() * width);
-    //   y = Math.floor(Math.random() * height);
-    // }
-    getApples() {
-        return this.apples;
-    }
-    isAppleInside(cell) {
-        for (const apple of this.apples){
-            if (apple.x === cell.x && apple.y === cell.y) return true;
-        }
-        return false;
-    }
-    removeApple(cell) {
-        const index = this.apples.findIndex((apple)=>apple.x === cell.x && apple.y === cell.y);
-        if (index !== -1) this.apples.splice(index, 1);
-    }
-    isEmpty() {
-        return this.apples.length === 0;
-    }
-}
-
-},{"./Cell":"3nSP0","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","../configuration":"kyQGN"}],"3nSP0":[function(require,module,exports) {
-var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
-parcelHelpers.defineInteropFlag(exports);
-parcelHelpers.export(exports, "Cell", ()=>Cell);
-class Cell {
-    constructor(x, y){
-        this.x = x;
-        this.y = y;
-    }
-}
-
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"guWf8":[function(require,module,exports) {
+},{"./engine/Snake":"guWf8","./configuration":"kyQGN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","./engine/Gamefield":"3Dw6Y"}],"guWf8":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "Snake", ()=>Snake);
@@ -906,14 +837,42 @@ class Snake {
         new (0, _cell.Cell)(1, 0)
     ];
     direction = "Right";
+    directions = [];
+    getOppositeDirection() {
+        switch(this.direction){
+            case "Up":
+                return "Down";
+            case "Down":
+                return "Up";
+            case "Left":
+                return "Right";
+            case "Right":
+                return "Left";
+            default:
+                return "Right";
+        }
+    }
     setDirection(newDirection) {
-        this.direction = newDirection;
+        const oppositeDirection = this.getOppositeDirection();
+        // console.log(oppositeDirection);
+        if (newDirection !== oppositeDirection) {
+            if (newDirection !== this.direction) this.directions.push(newDirection);
+        }
+        return this.direction;
     }
     move() {
         const oldHeadPosition = this.getHead();
         this.tail.shift();
         this.tail.push(new (0, _cell.Cell)(oldHeadPosition.x, oldHeadPosition.y));
         const head = this.getHead();
+        while(this.directions.length > 0){
+            const newDirection = this.directions.shift();
+            const oppositeDirection = this.getOppositeDirection();
+            if (newDirection !== oppositeDirection) {
+                this.direction = newDirection;
+                break;
+            }
+        }
         if (this.direction === "Right") this.head = new (0, _cell.Cell)(head.x + 1, head.y);
         if (this.direction === "Down") this.head = new (0, _cell.Cell)(head.x, head.y + 1);
         if (this.direction === "Left") this.head = new (0, _cell.Cell)(head.x - 1, head.y);
@@ -937,10 +896,95 @@ class Snake {
         return this.tail;
     }
     isTakenBySnake(cell) {
+        // return false;
+        for (const tailCell of this.tail){
+            if (tailCell.x === cell.x && tailCell.y === cell.y) return true;
+        }
         return false;
     }
 }
 
-},{"./Cell":"3nSP0","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["5TkPT","crwHW"], "crwHW", "parcelRequirebbf8")
+},{"./Cell":"3nSP0","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3nSP0":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "Cell", ()=>Cell);
+class Cell {
+    constructor(x, y){
+        this.x = x;
+        this.y = y;
+    }
+    equals(other) {
+        return this.x === other.x && this.y === other.y;
+    }
+}
+
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"3Dw6Y":[function(require,module,exports) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "GameField", ()=>GameField);
+var _cell = require("./Cell");
+var _snake = require("./Snake");
+var _configuration = require("../configuration");
+var _configurationDefault = parcelHelpers.interopDefault(_configuration);
+class GameField {
+    /**
+   * Called when level completed
+   */ apples = [];
+    snake = new (0, _snake.Snake)();
+    // private snake: Snake;
+    constructor(game){
+        this.width = (0, _configurationDefault.default).nbCellsX;
+        this.height = (0, _configurationDefault.default).nbCellsY;
+        this.game = game;
+        this.snake = new (0, _snake.Snake)();
+        // this.snake = this.snake;
+        this.seed();
+    }
+    // const width = 45;
+    // const height = 25;
+    // Code if you want to increase number of apples for each level:
+    // let level = 0;
+    // if (this.game) {
+    //   level = this.game.runtimeConfiguration.level;
+    // }
+    // const numOfApples = level + 5;
+    seed() {
+        const numOfApples = 5;
+        this.apples = [];
+        for(let i = 1; i <= numOfApples; i++)// let x = Math.floor(Math.random() * this.width);
+        // let y = Math.floor(Math.random() * this.height);
+        while(true){
+            const x = Math.floor(Math.random() * this.width);
+            const y = Math.floor(Math.random() * this.height);
+            const cell = new (0, _cell.Cell)(x, y);
+            if (!this.snake.isTakenBySnake(cell)) {
+                if (this.snake.head.x !== cell.x && this.snake.head.y !== cell.y) {
+                    if (!this.apples.some((apple)=>apple.equals(cell))) {
+                        this.apples.push(cell);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    getApples() {
+        return this.apples;
+    }
+    isAppleInside(cell) {
+        for (const apple of this.apples){
+            if (apple.x === cell.x && apple.y === cell.y) return true;
+        }
+        return false;
+    }
+    removeApple(cell) {
+        const index = this.apples.findIndex((apple)=>apple.x === cell.x && apple.y === cell.y);
+        if (index !== -1) this.apples.splice(index, 1);
+    }
+    isEmpty() {
+        return this.apples.length === 0;
+    }
+}
+
+},{"./Cell":"3nSP0","./Snake":"guWf8","../configuration":"kyQGN","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["5TkPT","crwHW"], "crwHW", "parcelRequirebbf8")
 
 //# sourceMappingURL=index.1c455e96.js.map

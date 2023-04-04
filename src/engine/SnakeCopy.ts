@@ -4,10 +4,9 @@ import { Direction } from "./Direction";
 export class Snake {
   head: Cell = new Cell(2, 0);
   tail: Cell[] = [new Cell(0, 0), new Cell(1, 0)];
-  direction: Direction | undefined = "Right";
-  directions: Direction[] = [];
+  direction: Direction = "Right";
 
-  private getOppositeDirection(): Direction | undefined {
+  private getOppositeDirection(): Direction {
     switch (this.direction) {
       case "Up":
         return "Down";
@@ -17,8 +16,6 @@ export class Snake {
         return "Right";
       case "Right":
         return "Left";
-      default:
-        return "Right";
     }
   }
 
@@ -26,9 +23,7 @@ export class Snake {
     const oppositeDirection = this.getOppositeDirection();
     // console.log(oppositeDirection);
     if (newDirection !== oppositeDirection) {
-      if (newDirection !== this.direction) {
-        this.directions.push(newDirection);
-      }
+      this.direction = newDirection;
     }
     return this.direction;
   }
@@ -38,15 +33,6 @@ export class Snake {
     this.tail.shift();
     this.tail.push(new Cell(oldHeadPosition.x, oldHeadPosition.y));
     const head = this.getHead();
-
-    while (this.directions.length > 0) {
-      const newDirection = this.directions.shift();
-      const oppositeDirection = this.getOppositeDirection();
-      if (newDirection !== oppositeDirection) {
-        this.direction = newDirection;
-        break;
-      }
-    }
 
     if (this.direction === "Right") {
       this.head = new Cell(head.x + 1, head.y);

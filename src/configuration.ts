@@ -7,7 +7,7 @@ interface Configuration {
 
 const configuration: Configuration = {
   maxLevel: 10,
-  defaultSpeed: 500,
+  defaultSpeed: 200,
   nbCellsX: 45,
   nbCellsY: 25,
 };
